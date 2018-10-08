@@ -11,7 +11,8 @@ import {
   Text,
   View
 } from 'react-native';
-
+import CryptoJS from "crypto-js";
+import CryptoJSAesJson from "./aes-json-format"
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
     'Cmd+D or shake for dev menu',
@@ -20,6 +21,40 @@ const instructions = Platform.select({
 });
 
 export default class App extends Component<{}> {
+  TestSendData() {
+    const that = this
+    return new Promise(function (resolve, reject) {
+        let datas = '{"user":"demo1","pass":"demo2"   }'
+        console.log(datas)
+         let ta = CryptoJS.AES.encrypt(JSON.stringify(datas), "a1s2d3", {format: CryptoJSAesJson}).toString(); 
+         console.log(ta)
+         fetch('http://localhost/phpapi/Api.php', {
+           method: 'POST',
+           headers: {
+             'Accept': 'application/json',
+             'Content-Type': 'application/json'
+         },
+             body:ta
+         
+         })
+            .then((response) => {
+              // console.log(response)
+               return response.json()
+            })
+            .then((responseJson) => {
+                console.log(responseJson)
+                resolve()
+            })
+            .catch((error) => {
+                //console.error(error);
+                reject()
+            })
+
+    })
+}
+componentDidMount(){
+  this.TestSendData()
+}
   render() {
     return (
       <View style={styles.container}>
